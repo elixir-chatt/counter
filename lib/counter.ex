@@ -1,14 +1,16 @@
 defmodule Counter do
   def start do
-    {:ok, pid} = GenServer.start_link(Counter.Service, 0)
-    pid
+    Counter.Server.start()
   end
   
   def tick(pid) do
-    GenServer.cast(pid, :tick)
+    send(pid, {:tick, self()})
   end
   
   def state(pid) do
-    GenServer.call(pid, :state)
+    send(pid, {:state, self()})
+    receive do
+      state -> state
+    end
   end
 end
